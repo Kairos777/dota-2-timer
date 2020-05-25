@@ -3,28 +3,26 @@ import { BOUNTY, PULL, AVANPOST, START, STOP, isTestMode } from './const';
 import audioService from "./services/audioService";
 import './App.css';
 
-function App() {
-    const [pullCheck, setPullCheck] = useState(false);
-    const [isInitialized, setIsInitialized] = useState(false);
+let bountyFirstSignalDelay = 4.5 * 60 * 1000;
+let bountyInterval = 5 * 60 * 1000;
+let avanpostFirstSignalDelay = 9.2 * 60 * 1000;
+let avanpostInterval = 10 * 60 * 1000;
+let pullInterval = 60 * 1000;
+let pullToStart = 95 * 1000;
+let timeToClearPullInterval = 8 * 60 * 1000;
+let bountyTimer, avanpostTimer, pullTimer;
+let bountyTimeout, avanpostTimeout, pullTimeout;
+let gameStartedDate = null;
 
-    // logic
-    let bountyFirstSignalDelay = 4.5 * 60 * 1000;
-    let bountyInterval = 5 * 60 * 1000;
-    let avanpostFirstSignalDelay = 9.2 * 60 * 1000;
-    let avanpostInterval = 10 * 60 * 1000;
-    let pullInterval = 60 * 1000;
-    let pullToStart = 95 * 1000;
-    let timeToClearPullInterval = 8 * 60 * 1000;
-    let initializeTime = 0;
-    let bountyTimer, avanpostTimer, pullTimer;
-    let bountyTimeout, avanpostTimeout, pullTimeout;
-    let gameStartedDate = null;
+function App() {
+    const [pullCheck, setPullCheck] = useState(true);
+    const [isInitialized, setIsInitialized] = useState(false);
+    const [initializeTime, setInitializeTime] = useState(85000);
 
     function initialize() {
         setIsInitialized(true);
         audioService.play(START);
         if (isTestMode) testModeVariablesUpdate();
-        setInizilizeTime();
         logStartGameTime();
         setPullNotifications();
         setAvanpostNotifications();
@@ -38,9 +36,8 @@ function App() {
         }, initializeTime);
     }
 
-    function setInizilizeTime() {
-        const initializeTimeSeconds = +document.getElementById("initializeTime").value;
-        initializeTime = initializeTimeSeconds > 0 ? initializeTimeSeconds * 1000 : 0;
+    function handleInitializeTimeChange({target : { value } }) {
+        setInitializeTime(value > 0 ? value * 1000 : 0);
     }
 
     function setPullNotifications() {
@@ -119,7 +116,7 @@ function App() {
 
     return (
         <div className="container">
-            <h2>Dota timer</h2>
+            <h2>Dota 2 timer</h2>
             <form className="options">
                 <p>Default notifications:</p>
                 <ul>
@@ -128,8 +125,10 @@ function App() {
                 </ul>
                 <br/>
                 <p>Additional options</p>
-                <input type="checkbox" name="creeps-pull" checked={pullCheck} onChange={( {target: { checked }} ) => { setPullCheck(checked) }}/>
-                <label htmlFor="creeps-pull">notify me to pull camps (first 8 minutes)</label>
+                <div className="options__item">
+                    <input type="checkbox" name="creeps-pull" id="creeps-pull" checked={pullCheck} onChange={( {target: { checked }} ) => { setPullCheck(checked) }}/>
+                    <label htmlFor="creeps-pull">notify me to pull camps (first 8 minutes)</label>
+                </div>
             </form>
 
             <form>
@@ -137,7 +136,7 @@ function App() {
                     creep wave has moved.</p>
                 <fieldset className="annotation">
                     <strong className="annotation__text">Seconds left before first creep wave</strong>
-                    <input id="initializeTime" type="text" name="initializeTime" defaultValue="85"/>
+                    <input id="initializeTime" type="text" name="initializeTime" value={initializeTime / 1000} onChange={handleInitializeTimeChange}/>
                 </fieldset>
             </form>
             <button className="manipulation btn btn-success" onClick={initialize} disabled={isInitialized} >init</button>
@@ -148,14 +147,8 @@ function App() {
 
 export default App;
 
-// react todo
-// audio block to separate component
-
-
-//
-// todo check shortcut console "2"
-// logic todo
+// todo add scss
 // todo add stack additional option
-// todo add all options to checkx form (gold and avanpost preselected)
-// maybe later disable some notifications while gaming
+// todo add all options to checks form (gold and avanpost preselected)
+// todo maybe later disable some notifications while gaming
 // src http://soundbible.com/tags-funny.html

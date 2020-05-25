@@ -16,5 +16,5 @@ function AudioService() {
     };
 }
 
-var audioServiceInstance = new AudioService();
+const audioServiceInstance = new AudioService();
 export default audioServiceInstance;

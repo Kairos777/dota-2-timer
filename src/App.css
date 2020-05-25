@@ -31,6 +31,19 @@ label {
   margin-bottom: 10px;
 }
 
+.options__item {
+  display: flex;
+  align-items: center;
+}
+
+.options__item input[type="checkbox"] {
+  margin: 0 5px 0 0;
+}
+
+.options__item label {
+  margin: 0;
+}
+
 .options li {
   cursor: pointer;
 }
